@@ -1,0 +1,8 @@
+{
+  "name": "allsync",
+  "version": "0.0.1",
+  "main": "index.js",
+  "repository": "",
+  "author": "Jacob Groundwater <groundwater@gmail.com>",
+  "license": "MIT"
+}
