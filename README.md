@@ -23,12 +23,17 @@ The above will not print `Done!` until the child process exits.
 
 ### Advanced
 
-At this time, AllSync does not capture `stderr`,
-if you want it you will have to redirect stderr in your command.
+If you want to capture `stderr`, you can do so with
 
-    allsync.exec( "find / 2>&1", function(data){...});
+    allsync.exec( "find / 2>&1", function(data){...} )
 
-Finally, AllSync returns with the exit code of the sub process.
+If you _really_ need your `stdout` and `stderr` streams as separate output,
+you can use `exec2`, but the semantics of the function are quite different:
 
-    var code = allsync.exec( "rm -rf /", function(data){...});
-    console.log("Child Process Exited with Code %d", code);
+    allsync.exec2( "find" , ["/"], function(code,stdout,stderr){
+        console.log("Child Exited with Code %d",code);
+        console.log("Child Had STDOUT",stdout);
+        console.log("Child Had STDERR",stderr);
+    })
+
+The `exec2` method will buffer all streams until the child process exits.
