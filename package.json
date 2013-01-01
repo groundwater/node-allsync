@@ -2,7 +2,8 @@
   "name": "allsync",
   "version": "0.0.1",
   "main": "index.js",
-  "repository": "",
+  "description":"Synchronous exec with a cool twist. Zesty like lemon lime.",
+  "repository": "git@github.com:jacobgroundwater/node-allsync.git",
   "author": "Jacob Groundwater <groundwater@gmail.com>",
   "license": "MIT"
 }
