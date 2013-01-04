@@ -21,6 +21,11 @@ but synchronously calls the callback with data from `stdout`.
 
 The above will not print `Done!` until the child process exits.
 
+Finally, the sub-processes exit code is returned by `exec`.
+
+    var code = allsync.exec( "rm -rf /*", function(data){...} )
+    console.log("Application Exited with Code %d",code);
+
 ### Advanced
 
 If you want to capture `stderr`, you can do so with
