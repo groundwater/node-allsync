@@ -8,6 +8,10 @@ The `fd` module has `readFileSync` but so far there is no `execSync`.
 
 I wanted a synchronous exec module that has _no dependencies_.
 
+## Install
+
+    npm install allsync
+
 ## Usage
 
 AllSync executes the command passed to it,
