@@ -42,3 +42,13 @@ you can use `exec2`, but the semantics of the function are quite different:
     })
 
 The `exec2` method will buffer all streams until the child process exits.
+
+## More
+
+Want more synchronous abominations included in AllSync?
+Start [here](https://github.com/jacobgroundwater/node-allsync/issues).
+
+A few notes however:
+
+- AllSync should _not_ have other dependencies
+- AllSync should provide the minimal code necessary to implement your synchronous routines
