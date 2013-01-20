@@ -142,6 +142,9 @@ static Handle<Value> NodeExec(const Arguments& args) {
   }
   
   int code = pclose(stream);
+  int status;
+  
+  waitpid(-1, &status, 0);
   
   return scope.Close(Integer::New(code));
 }
