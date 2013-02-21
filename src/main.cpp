@@ -1,13 +1,14 @@
+#include <cstdio>
 #include <stdio.h>
 #include <iostream>
-
+#include <sys/wait.h>
 #include <v8.h>
 #include <node.h>
 
 using namespace v8;
 using namespace node;
 
-int MAX_BUFFER = 100;
+int MAX_BUFFER = 1000;
 
 // Copy string content to a new heap object
 char* getAscii( Handle<String> item ){
@@ -17,13 +18,12 @@ char* getAscii( Handle<String> item ){
   return out;
 }
 
-static Handle<Value> NodeExec2(const Arguments& args) {
+static Handle<Value> NodePopen2(const Arguments& args) {
   HandleScope scope;
   
   // Expect a callback function for stdout
   Handle<String> Command = Handle<String  >::Cast(args[0]);
   Handle<Array> ArgArray = Handle<Array   >::Cast(args[1]);
-  Handle<Function>    Cb = Handle<Function>::Cast(args[2]);
   
   // Create Pipes for STDIN, STDOUT, and STDERR //
   
@@ -40,6 +40,8 @@ static Handle<Value> NodeExec2(const Arguments& args) {
   
   pid_t pid;
   pid = fork();
+  
+  Handle<Object> ob = Object::New();
   
   if(pid == (pid_t) 0)
   {
@@ -78,8 +80,6 @@ static Handle<Value> NodeExec2(const Arguments& args) {
   {
     // Parent
     
-    std::printf("Receiving Output from Child %d\n",pid);
-    
     // Close Unused Ends for Parent
     close( pipe_stdin [PIPE_READ]  );
     close( pipe_stdout[PIPE_WRITE] );
@@ -103,19 +103,16 @@ static Handle<Value> NodeExec2(const Arguments& args) {
     int status;
     waitpid(pid, &status, 0);
     
-    Handle<Value> argv[3];
-    argv[0] = Integer::New(status);
-    argv[1] = String::New(stdout.c_str());
-    argv[2] = String::New(stderr.c_str());
-    
-    Cb->Call( Context::GetCurrent()->Global(), 3, argv );
+    ob->Set( String::NewSymbol("code"),   Integer::New(status) );
+    ob->Set( String::NewSymbol("stdout"), String::New(stdout.c_str()) );
+    ob->Set( String::NewSymbol("stderr"), String::New(stderr.c_str()) );
     
   }
   
-  return scope.Close(Undefined());
+  return scope.Close(ob);
 }
 
-static Handle<Value> NodeExec(const Arguments& args) {
+static Handle<Value> NodePopen(const Arguments& args) {
   
   HandleScope scope;
   
@@ -130,7 +127,7 @@ static Handle<Value> NodeExec(const Arguments& args) {
   
   char buffer[MAX_BUFFER];
   
-  FILE *stream = popen( command, "r");
+  FILE *stream = popen( command, "r" );
   
   Handle<Value> argv[1];
   while ( std::fgets(buffer, MAX_BUFFER, stream) != NULL )
@@ -142,18 +139,32 @@ static Handle<Value> NodeExec(const Arguments& args) {
   }
   
   int code = pclose(stream);
-  int status;
-  
-  waitpid(-1, &status, 0);
   
   return scope.Close(Integer::New(code));
 }
 
+static Handle<Value> NodeSystem(const Arguments& args)
+{
+  HandleScope scope;
+  
+  // Expect a callback function for stdout
+  Handle<String> Command = Handle<String  >::Cast(args[0]);
+  
+  // Create Pipes for STDIN, STDOUT, and STDERR //
+  char* command = getAscii(Command);
+  
+  system(command);
+  
+  return scope.Close(Undefined());
+}
+
 static void init(Handle<Object> target) {
-  target->Set(String::NewSymbol("exec"),
-    FunctionTemplate::New(NodeExec)->GetFunction());	
-  target->Set(String::NewSymbol("exec2"),
-    FunctionTemplate::New(NodeExec2)->GetFunction());	
+  target->Set(String::NewSymbol("system"),
+    FunctionTemplate::New(NodeSystem)->GetFunction());
+  target->Set(String::NewSymbol("popen"),
+    FunctionTemplate::New(NodePopen)->GetFunction());
+  target->Set(String::NewSymbol("popen2"),
+    FunctionTemplate::New(NodePopen2)->GetFunction());
 }
 
 NODE_MODULE(allsync, init)
