@@ -1,6 +1,6 @@
 {
   "name": "allsync",
-  "version": "0.0.3",
+  "version": "0.0.3a",
   "main": "index.js",
   "description":"Synchronous exec with a cool twist. Zesty like lemon lime.",
   "repository": "git@github.com:jacobgroundwater/node-allsync.git",

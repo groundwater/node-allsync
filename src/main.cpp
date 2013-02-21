@@ -143,24 +143,7 @@ static Handle<Value> NodePopen(const Arguments& args) {
   return scope.Close(Integer::New(code));
 }
 
-static Handle<Value> NodeSystem(const Arguments& args)
-{
-  HandleScope scope;
-  
-  // Expect a callback function for stdout
-  Handle<String> Command = Handle<String  >::Cast(args[0]);
-  
-  // Create Pipes for STDIN, STDOUT, and STDERR //
-  char* command = getAscii(Command);
-  
-  system(command);
-  
-  return scope.Close(Undefined());
-}
-
 static void init(Handle<Object> target) {
-  target->Set(String::NewSymbol("system"),
-    FunctionTemplate::New(NodeSystem)->GetFunction());
   target->Set(String::NewSymbol("popen"),
     FunctionTemplate::New(NodePopen)->GetFunction());
   target->Set(String::NewSymbol("popen2"),
